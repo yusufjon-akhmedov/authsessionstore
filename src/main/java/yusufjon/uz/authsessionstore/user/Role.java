@@ -1,4 +1,6 @@
 package yusufjon.uz.authsessionstore.user;
 
-public class Role {
+public enum Role {
+    USER,
+    ADMIN
 }
