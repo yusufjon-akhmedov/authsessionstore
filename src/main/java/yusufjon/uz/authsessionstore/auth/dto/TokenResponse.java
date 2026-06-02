@@ -1,4 +1,9 @@
 package yusufjon.uz.authsessionstore.auth.dto;
 
-public class TokenResponse {
+public record TokenResponse (
+        String accessToken,
+        String refreshToken,
+        String tokenType,
+        long expiresInSeconds
+) {
 }
