@@ -31,7 +31,12 @@ public class RedisTokenService {
     public void saveSession(SessionInfo sessionInfo, Duration ttl) {
         try {
             String json = objectMapper.writeValueAsString(sessionInfo);
-            redisTemplate.opsForValue().set(refreshTokenKey(sessionInfo.userId(), sessionInfo.sessionId()), json, ttl);
+
+            redisTemplate.opsForValue().set(
+                    sessionKey(sessionInfo.userId(), sessionInfo.sessionId()),
+                    json,
+                    ttl
+            );
         } catch (JsonProcessingException e) {
             throw new ApiException(INTERNAL_SERVER_ERROR, "Could not serialize session info");
         }

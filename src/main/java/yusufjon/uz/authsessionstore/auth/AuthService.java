@@ -48,11 +48,11 @@ public class AuthService {
         String email = normalizeEmail(request.email());
 
         if (userRepository.existsByEmail(email)) {
-            throw new ApiException(CONFLICT, "Email already exist");
+            throw new ApiException(CONFLICT, "Email already exists");
         }
 
         User user = User.builder()
-                .fullName(request.fullName())
+                .fullName(request.fullName().trim())
                 .email(email)
                 .password(passwordEncoder.encode(request.password()))
                 .role(Role.USER)
@@ -83,7 +83,14 @@ public class AuthService {
         String accessToken = jwtService.generateAccessToken(user, sessionId);
         String refreshToken = jwtService.generateRefreshToken(user, sessionId);
 
-        redisTokenService.saveRefreshToken(user.getId(), sessionId, refreshToken, refreshTtl);
+        redisTokenService.saveRefreshToken(
+                user.getId(),
+                sessionId,
+                refreshToken,
+                refreshTtl
+        );
+
+        Instant now = Instant.now();
 
         SessionInfo sessionInfo = new SessionInfo(
                 sessionId,
@@ -91,8 +98,8 @@ public class AuthService {
                 user.getEmail(),
                 ipAddress,
                 userAgent,
-                Instant.now(),
-                Instant.now().plus(refreshTtl)
+                now,
+                now.plus(refreshTtl)
         );
 
         redisTokenService.saveSession(sessionInfo, refreshTtl);
@@ -126,11 +133,14 @@ public class AuthService {
         User user = findUserByEmail(email);
         UUID sessionId = UUID.fromString(sessionIdValue);
 
-        String storeRefreshToken = redisTokenService
+        String storedRefreshToken = redisTokenService
                 .findRefreshToken(user.getId(), sessionId)
-                .orElseThrow(() -> new ApiException(UNAUTHORIZED, "Refresh token expired or revoked"));
+                .orElseThrow(() -> new ApiException(
+                        UNAUTHORIZED,
+                        "Refresh token expired or revoked"
+                ));
 
-        if (!storeRefreshToken.equals(refreshToken)) {
+        if (!storedRefreshToken.equals(refreshToken)) {
             throw new ApiException(UNAUTHORIZED, "Refresh token mismatch");
         }
 
@@ -190,7 +200,10 @@ public class AuthService {
         String email = normalizeEmail(request.email());
 
         String storedOtp = redisTokenService.findOtp(email)
-                .orElseThrow(() -> new ApiException(BAD_REQUEST, "OTP expired or not found"));
+                .orElseThrow(() -> new ApiException(
+                        BAD_REQUEST,
+                        "OTP expired or not found"
+                ));
 
         if (!storedOtp.equals(request.otp())) {
             throw new ApiException(BAD_REQUEST, "Invalid OTP");
@@ -220,7 +233,10 @@ public class AuthService {
     @Transactional
     public MessageResponse resetPassword(ResetPasswordRequest request) {
         Long userId = redisTokenService.findPasswordResetUserId(request.token())
-                .orElseThrow(() -> new ApiException(BAD_REQUEST, "Reset token expired or invalid"));
+                .orElseThrow(() -> new ApiException(
+                        BAD_REQUEST,
+                        "Reset token expired or invalid"
+                ));
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApiException(NOT_FOUND, "User not found"));
@@ -231,7 +247,7 @@ public class AuthService {
         redisTokenService.deletePasswordResetToken(request.token());
         redisTokenService.deleteAllSessions(user.getId());
 
-        return new MessageResponse("Password reset successfully. All sessions were revoked");
+        return new MessageResponse("Password reset successfully. All sessions were revoked.");
     }
 
     private User findUserByEmail(String email) {
@@ -244,15 +260,7 @@ public class AuthService {
         return String.format("%06d", number);
     }
 
-
     private String normalizeEmail(String email) {
         return email.trim().toLowerCase();
     }
-
 }
-
-
-
-
-
-
