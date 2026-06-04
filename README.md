@@ -191,6 +191,17 @@ curl -X POST http://localhost:8080/api/auth/logout \
 
 ---
 
+## Default test users
+
+Flyway inserts default users for local testing through `V2__insert_default_users.sql`. After the application starts and migrations run, you can login with:
+
+| Role | Email | Password |
+|----------------|-------------------------|---------------------|
+| `ADMIN` | `admin@gmail.com` | `AdminPassword123` |
+| `USER` | `user@gmail.com` | `UserPassword123` |
+
+---
+
 ## Build & run
 
 ### A) Local JVM with Dockerized PostgreSQL and Redis
