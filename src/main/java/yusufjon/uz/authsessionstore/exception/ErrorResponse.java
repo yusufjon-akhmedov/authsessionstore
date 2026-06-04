@@ -1,4 +1,12 @@
 package yusufjon.uz.authsessionstore.exception;
 
-public class ErrorResponse {
+import java.time.Instant;
+
+public record ErrorResponse (
+        Instant timeStamp,
+        int status,
+        String error,
+        String message,
+        String path
+) {
 }

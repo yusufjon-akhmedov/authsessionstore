@@ -47,7 +47,7 @@ public class AuthService {
     public MessageResponse register(RegisterRequest request) {
         String email = normalizeEmail(request.email());
 
-        if (userRepository.existByEmail(email)) {
+        if (userRepository.existsByEmail(email)) {
             throw new ApiException(CONFLICT, "Email already exist");
         }
 

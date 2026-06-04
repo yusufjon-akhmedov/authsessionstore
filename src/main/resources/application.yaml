@@ -6,9 +6,10 @@ spring:
     name: authsessionstore
 
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/auth_session_store}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5436/auth_session_store}
     username: ${SPRING_DATASOURCE_USERNAME:postgres}
     password: ${SPRING_DATASOURCE_PASSWORD:1234}
+    driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
@@ -27,6 +28,9 @@ spring:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
+      timeout: 3000ms
+      repositories:
+        enabled: false
 
   mail:
     host: ${SPRING_MAIL_HOST:smtp.gmail.com}
@@ -45,10 +49,16 @@ management:
     web:
       exposure:
         include: health,info
+
   endpoint:
     health:
+      show-details: always
       probes:
         enabled: true
+
+  health:
+    mail:
+      enabled: false
 
 app:
   jwt:
@@ -61,3 +71,8 @@ app:
 
   password-reset:
     expiration-minutes: ${PASSWORD_RESET_EXPIRATION_MINUTES:15}
+
+logging:
+  level:
+    org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer: ERROR
+    org.springframework.data.redis.repository.configuration: ERROR

@@ -2,6 +2,8 @@ package yusufjon.uz.authsessionstore.user;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -41,28 +43,13 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private boolean enabled = true;
 
-    @Column(name = "created_at", nullable = false)
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
+    @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
-
-
-    @PrePersist
-    void prePersist() {
-        Instant now = Instant.now();
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-
-        if(this.role == null) {
-            this.role = Role.USER;
-        }
-    }
-
-    @PreUpdate
-    void preUpdate() {
-        this.updatedAt = Instant.now();
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -72,6 +59,11 @@ public class User implements UserDetails {
     @Override
     public String getUsername() {
         return email;
+    }
+
+    @Override
+    public String getPassword() {
+        return password;
     }
 
     @Override
@@ -89,4 +81,8 @@ public class User implements UserDetails {
         return true;
     }
 
+    @Override
+    public boolean isEnabled() {
+        return enabled;
+    }
 }
