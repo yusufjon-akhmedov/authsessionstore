@@ -1,0 +1,31 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  data:
+    redis:
+      repositories:
+        enabled: false
+
+management:
+  health:
+    mail:
+      enabled: false
+
+app:
+  jwt:
+    secret: dGVzdC1qd3Qtc2VjcmV0LXRlc3Qtand0LXNlY3JldC10ZXN0LWp3dC1zZWNyZXQtMTIzNDU2Nzg5MA==
+    access-token-expiration-minutes: 15
+    refresh-token-expiration-days: 7
+
+  otp:
+    expiration-minutes: 5
+
+  password-reset:
+    expiration-minutes: 15

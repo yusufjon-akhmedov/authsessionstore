@@ -260,15 +260,22 @@ After startup:
 
 ## Testing
 
-* **JUnit 5** is configured through Spring Boot Test.
-* **Spring Security Test** and **Testcontainers** dependencies are available for future endpoint and integration coverage.
-* The current test suite contains a minimal application-class smoke test.
+* **AuthServiceTest** uses JUnit 5 and Mockito to verify registration, login, refresh-token validation, logout, OTP, forgot-password, and reset-password service behavior.
+* **SessionServiceTest** uses Mockito to verify session lookup, single-session deletion, all-session deletion, and missing-user handling.
+* **JwtServiceTest** verifies generated JWT claims, token parsing, extractors, token type handling, and remaining TTL calculation with a test Base64 secret.
+* **RedisTokenServiceTest** uses a real Redis Testcontainer to verify refresh tokens, session storage, access-token blacklist entries, OTPs, password reset tokens, and delete flows.
+* **AuthIntegrationTest** uses Spring Boot Test, MockMvc, PostgreSQL Testcontainer, Redis Testcontainer, Flyway migrations, and dynamic test properties to verify the public authentication flow and protected session endpoints end to end.
+* **application-test.yml** disables mail health checks and Redis repositories for tests while keeping PostgreSQL/Flyway validation enabled.
+
+The tests do not use H2 and do not depend on local PostgreSQL or Redis ports. Docker must be running because Testcontainers starts real `postgres:16-alpine` and `redis:7-alpine` containers.
 
 Run the test suite with:
 
 ```bash
-./mvnw test
+mvn clean test
 ```
+
+Current verified result: **53 tests**, **0 failures**, **0 errors**, **0 skipped**.
 
 ---
 
